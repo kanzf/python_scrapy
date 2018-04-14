@@ -1,31 +1,44 @@
 import scrapy
-# import os
+import re
+import json
+from scrapy import Request
 #
 from xiaohua.items import XiaohuaItem
 #
 class XhSpider(scrapy.Spider):
     name='xh'
+    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'}
     allowed_domains=['xiaohua100.cn']
     start_urls=[
-        'http://www.xiaohua100.cn/daxue/'
-    ]
-#
+        'http://www.xiaohua100.cn/plus/waterfall.php?tid=0&sort=lastpost&totalresult=890&pageno=0&r=0.6344639519218045&display=pic&isAjax=1&l=1358747256127773&ts=135874808804&tk=cb50cab524b3be07ac28fc6141350f86'
+        ]
+    # def start_requests(self):
+
+        # url='http://www.xiaohua100.cn/plus/waterfall.php?tid=0&sort=lastpost&totalresult=890&pageno=2&r=0.6344639519218045&display=pic&isAjax=1&l=1358747256127773&ts=135874808804&tk=cb50cab524b3be07ac28fc6141350f86'
+        # yield Request(url,headers=self.headers)
     def parse(self, response):
         # 获取所有图片标签
-        print(response.url)
+        # print(response.url)
         print('-----------------------------------------------------------------------------------------------------------------------')
+        # datas=json.loads(response.body)
         allpics=response.xpath('//div[@class="pic"]/a')
+
         # print(allpics)
         for pic in allpics:
             # 分别处理每个图片，取出名称和地址
             item=XiaohuaItem()
-            name=pic.xpath('./img/@alt').extract()[0]
+            name_a=pic.xpath('./img/@alt').extract()[0]
+            name=name_a.split('/')[-1]
             addr=pic.xpath('./img/@src').extract()[0]
             addr='http://www.xiaohua100.cn'+addr
             item['name']=name
             item['addr']=addr
             # print(item)
             yield item
+        # page_add=re.search(r'pageno=(\d+)',response.url).group(1)
+        # page_add='pageno'+ str(int(page_add)+1)
+        # next_url=re.sub(r'pageno=\d+',page_add,response.url)
+        # yield Request(next_url,headers=self.headers)
 # 进阶篇 获取图片
 print('-----------------------------------------------------------------------------------------------------------------------')
 
