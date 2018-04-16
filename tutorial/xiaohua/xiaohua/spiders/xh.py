@@ -22,20 +22,27 @@ class XhSpider(scrapy.Spider):
         # print(response.url)
         print('-----------------------------------------------------------------------------------------------------------------------')
         # datas=json.loads(response.body)
-        allpics=response.xpath('//div[@class="pic"]/a')
+        # allpics=response.xpath('//div[@class="pic"]/a')
+        allin=response.xpath('//div')
 
         # print(allpics)
-        for pic in allpics:
+        # for pic in allpics:
+        for pic in allin:
             # 分别处理每个图片，取出名称和地址
             item=XiaohuaItem()
-            name=pic.xpath('./img/@src').extract()[0]
-            name=name.split('/')[-1]
-            addr=pic.xpath('./img/@src').extract()[0]
+            if pic.xpath('./h3/span[@class="cellTit"]/a/text()').extract():
+                name = pic.xpath('./h3/span[@class="cellTit"]/a/text()').extract()
+            # name=pic.xpath('./img/@src').extract()[0]
+            # name=name.split('/')[-1]
+            if pic.xpath('./div[@class="pic"]/a/img/@src').extract():
+                addr=pic.xpath('./div[@class="pic"]/a/img/@src').extract()[0]
+            # addr=pic.xpath('./img/@src').extract()[0]
             addr='http://www.xiaohua100.cn'+addr
             item['name']=name
             item['addr']=addr
             # print(item)
             yield item
+
         page_add=re.search(r'pageno=(\d+)',response.url).group(1)
         page_add='pageno='+ str(int(page_add)+1)
         next_url=re.sub(r'pageno=\d+',page_add,response.url)
