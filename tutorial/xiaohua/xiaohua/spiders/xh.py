@@ -23,23 +23,26 @@ class XhSpider(scrapy.Spider):
         print('-----------------------------------------------------------------------------------------------------------------------')
         # datas=json.loads(response.body)
         # allpics=response.xpath('//div[@class="pic"]/a')
-        allin=response.xpath('//div')
+        allin=response.xpath('//div[@class="p-cell cellItem nofavorite backwater"]')#可定位节点其中的一个属性
 
         # print(allpics)
         # for pic in allpics:
         for pic in allin:
             # 分别处理每个图片，取出名称和地址
             item=XiaohuaItem()
-            if pic.xpath('./h3/span[@class="cellTit"]/a/text()').extract():
-                name = pic.xpath('./h3/span[@class="cellTit"]/a/text()').extract()
+            # if pic.xpath('./h3/span[@class="cellTit"]/a/text()').extract():
+            name = pic.xpath('./h3/span[@class="cellTit"]/a/text()').extract()
+            item['name'] = name
             # name=pic.xpath('./img/@src').extract()[0]
             # name=name.split('/')[-1]
-            if pic.xpath('./div[@class="pic"]/a/img/@src').extract():
-                addr=pic.xpath('./div[@class="pic"]/a/img/@src').extract()[0]
+            # if pic.xpath('./div[@class="pic"]/a/img/@src').extract()[0]:
+            addr=pic.xpath('./div[@class="pic"]/a/img/@src').extract()[0]
             # addr=pic.xpath('./img/@src').extract()[0]
             addr='http://www.xiaohua100.cn'+addr
-            item['name']=name
+            # addr='http://www.xiaohua100.cn'+addr
             item['addr']=addr
+            # item['name']=name
+            # item['addr']=addr
             # print(item)
             yield item
 
